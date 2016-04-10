@@ -6,8 +6,7 @@
     ],
     AttributeDefinitions: [       
         { AttributeName: "Termometr", AttributeType: "S" },
-        { AttributeName: "GetDate", AttributeType: "S" },
-	{ AttributeName: 'Val', AttributeType: "N" }
+        { AttributeName: "GetDate", AttributeType: "N" },
     ],
     ProvisionedThroughput: {       
         ReadCapacityUnits: 10, 

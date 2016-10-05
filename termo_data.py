@@ -23,9 +23,9 @@ while 1:
 		db.put_values(float(values[0]),float(values[1]))
 		print ("good read and write: "+ch)
 	else:
-		print ("read invalid data from serial: ")
+		print ("read invalid data from serial: '")
 		print ch
-		print "\n"
+		print "'\n"
         time.sleep(5)
 f.sclose()
 

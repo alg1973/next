@@ -30,6 +30,6 @@ void loop()
   Serial.print(dht.getHumidity());
   Serial.print("\t");
   Serial.print(session_count);
-  Serial.print("\r\n");
+  Serial.print("\n");
   session_count++;
 }

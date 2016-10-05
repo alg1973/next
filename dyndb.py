@@ -30,7 +30,7 @@ def get_now():
 
 
 
-db=Tempdb()
-db.put_values('25.5','30')
-db.put_values('35.5','30')
-db.put_values('35.5','10')
+#db=Tempdb()
+#db.put_values('25.5','30')
+#db.put_values('35.5','30')
+#db.put_values('35.5','10')

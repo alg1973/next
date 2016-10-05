@@ -1,7 +1,11 @@
 from __future__ import print_function # Python 2/3 compatibility
 import boto3
+import tconf
 
-dynamodb = boto3.resource('dynamodb', region_name='us-east-1', endpoint_url="http://localhost:8000")
+#url="https://dynamodb.eu-central-1.amazonaws.com"
+#region="eu-central-1"
+
+dynamodb = boto3.resource('dynamodb', region_name=tconf.region, endpoint_url=tconf.url)
 
 
 table = dynamodb.create_table(

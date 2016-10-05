@@ -9,7 +9,7 @@ class Serial:
         self.tty_name=t
         # While PySerial would be preferable and more machine-independant,
         # it does not support echo suppression
-        self.tser= open(self.tty_name, 'r+')
+        self.tser= open(self.tty_name, 'r+',buffering=0)
         # Config the debug serial port
         self.oldattrs = termios.tcgetattr(self.tser)
         newattrs = termios.tcgetattr(self.tser)

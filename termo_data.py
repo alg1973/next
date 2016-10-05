@@ -13,7 +13,7 @@ else:
 
 f=serio.Serial(tty_name)
 time.sleep(3)
-db=dyndb.Tempdb()
+db=dyndb.Tempdb(tconf.url,tconf.region)
 while 1:
         f.swrite("\n")
         time.sleep(0.5)

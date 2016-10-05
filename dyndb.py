@@ -5,8 +5,8 @@ import time
 
 
 class Tempdb:
-    def __init__(self,url="http://localhost:8000"):
-    	self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1', endpoint_url=url)
+    def __init__(self,url="http://localhost:8000",region="eu-central-1"):
+    	self.dynamodb = boto3.resource('dynamodb', region_name=region, endpoint_url=url)
     	self.table = self.dynamodb.Table('Temperature');
 
     def put_values(self,temperature,humidity,thermo_name="InsideHall"):

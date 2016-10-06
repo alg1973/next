@@ -6,10 +6,12 @@ import dyndb
 import serio
 import tconf
 
-if len(sys.argv)==2:
+if len(sys.argv)==3:
         tty_name=sys.argv[1]
+        thermo_name=sys.argv[2]
 else:
         tty_name=tconf.tty
+        thermo_name=tconf.thermo_name
 
 f=serio.Serial(tty_name)
 time.sleep(3)
@@ -20,10 +22,10 @@ while 1:
         ch=f.sread()
 	values=ch.split()
 	if len(values) == 3:
-		db.put_values(float(values[0]),float(values[1]))
-		print ("good read and write: "+ch)
+		db.put_values(float(values[0]),float(values[1]),thermo_name)
+		print time.time(),ch
 	else:
-		print ("read invalid data from serial: '")
+		print ("ERR read invalid data from serial: '")
 		print ch
 		print "'\n"
         time.sleep(tconf.therm_rate)

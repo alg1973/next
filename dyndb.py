@@ -18,8 +18,8 @@ class Tempdb:
             		'hum': get_val(humidity),
         	}
     	)
-   	print('put_item result:', response)
-   	print('\n')
+#   	print('put_item result:', response)
+#   	print('\n')
 
 
 def get_val(thermo):

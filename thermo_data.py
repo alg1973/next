@@ -26,7 +26,7 @@ while 1:
 		print ("read invalid data from serial: '")
 		print ch
 		print "'\n"
-        time.sleep(tconf.term_rate)
+        time.sleep(tconf.therm_rate)
 f.sclose()
 
 

@@ -4,4 +4,4 @@ url="https://dynamodb.eu-central-1.amazonaws.com"
 region="eu-central-1"
 #tty="/dev/cu.wchusbserial1410"
 tty="/dev/ttyUSB0"
-term_rate=120
+therm_rate=120

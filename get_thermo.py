@@ -1,0 +1,35 @@
+#!/usr/bin/python 
+
+import sys
+import time
+import dyndb
+import tconf
+import json
+import decimal
+from boto3.dynamodb.conditions import Key, Attr
+
+# Helper class to convert a DynamoDB item to JSON.
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            if o % 1 > 0:
+                return float(o)
+            else:
+                return int(o)
+        return super(DecimalEncoder, self).default(o)
+
+
+if len(sys.argv)==2:
+        thermo_name=sys.argv[2]
+else:
+        thermo_name=tconf.thermo_name
+
+db=dyndb.Tempdb(tconf.url,tconf.region)
+response = db.thermo_get_minutes(60,thermo_name)
+
+
+for i in response['Items']:
+#   print(json.dumps(i, cls=DecimalEncoder))
+    print(time.ctime(float(i['GetDate'])),'t',float(i['val']), 'h', float(i['hum']))
+
+

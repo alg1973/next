@@ -22,8 +22,8 @@ while 1:
         ch=f.sread()
 	values=ch.split()
 	if len(values) == 3:
-		db.put_values(float(values[0]),float(values[1]),thermo_name)
 		print time.time(),ch
+		db.put_values(values[0],values[1],thermo_name)
 	else:
 		print ("ERR read invalid data from serial: '")
 		print ch

@@ -7,7 +7,7 @@ void setup()
 {
   Serial.begin(9600);
 
-  dht.setup(2,DHT::DHT11); // data pin 2
+  dht.setup(2); // data pin 2
   delay(dht.getMinimumSamplingPeriod());
 }
 

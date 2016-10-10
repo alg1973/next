@@ -2,6 +2,7 @@ from __future__ import print_function # Python 2/3 compatibility
 import boto3
 import decimal
 import time
+from boto3.dynamodb.conditions import Key, Attr
 
 
 class Tempdb:
@@ -29,8 +30,15 @@ class Tempdb:
                         }
                 ) 
          return response
-#   	print('put_item result:', response)
-#   	print('\n')
+
+    def thermo_get_minutes(self,minutes,thermo_name="InsideHall"):
+        response = self.table.query(
+            KeyConditionExpression=Key('Thermometer').eq(thermo_name) &
+                                        Key('GetDate').gt(get_val(time.time()-minutes*60))
+            )
+        return response
+
+    
 
 
 def get_val(thermo):

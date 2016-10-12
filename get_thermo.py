@@ -20,12 +20,17 @@ class DecimalEncoder(json.JSONEncoder):
 
 
 if len(sys.argv)==2:
+	minutes=int(sys.argv[1])
+        thermo_name=tconf.thermo_name
+elif len(sys.argv)==3:
+	minutes=int(sys.argv[1])
         thermo_name=sys.argv[2]
 else:
+	minutes=60
         thermo_name=tconf.thermo_name
 
 db=dyndb.Tempdb(tconf.url,tconf.region)
-response = db.thermo_get_minutes(60,thermo_name)
+response = db.thermo_get_minutes(minutes,thermo_name)
 
 
 for i in response['Items']:

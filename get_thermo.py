@@ -35,6 +35,7 @@ response = db.thermo_get_minutes(minutes,thermo_name)
 
 for i in response['Items']:
 #   print(json.dumps(i, cls=DecimalEncoder))
-    print(time.ctime(float(i['GetDate'])),'t',float(i['val']), 'h', float(i['hum']))
+    print(time.ctime(float(i['GetDate'])),'t',float(i['val']), 'h', float(i['hum']),
+			int(i.get('target',-1)),int(i.get('heating',-1)))
 
 

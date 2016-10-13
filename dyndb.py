@@ -9,9 +9,9 @@ class Tempdb:
     def __init__(self,url="http://localhost:8000",region="eu-central-1"):
     	self.dynamodb = boto3.resource('dynamodb', region_name=region, 
 					endpoint_url=url)
-    	self.table = self.dynamodb.Table('Temperature');
+    	self.table = self.dynamodb.Table('Temperature')
 
-    def put_values(self,temperature,humidity,thermo_name="InsideHall"):
+    def put_values(self,temperature,humidity,thermo_name="InsideHall",target_t=100,is_heating=0):
          try:
    		response=self.table.put_item(
         		Item={
@@ -19,6 +19,8 @@ class Tempdb:
             			'GetDate': get_now(),
             			'val': get_val(temperature),
             			'hum': get_val(humidity),
+            			'target': get_val(target_t),
+            			'heating': get_val(is_heating),
         		}
     		)
          except decimal.Inexact:
@@ -28,6 +30,8 @@ class Tempdb:
                                 'GetDate': get_now(),
                                 'val': float_to_decimal(temperature),
                                 'hum': float_to_decimal(humidity),
+            			'target': float_to_decimal(target_t),
+            			'heating': get_val(int(is_heating)),
                         }
                 ) 
          return response

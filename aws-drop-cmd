@@ -1,0 +1,1 @@
+aws dynamodb delete-table --table-name 'Commands' --endpoint-url 'https://dynamodb.eu-central-1.amazonaws.com' --region 'eu-central-1'

@@ -18,5 +18,8 @@ else:
 
 
 b=bstate.Boiler(thermo_name)
+db=dyndb.Tempdb(tconf.url,tconf.region)
+response=db.thermo_cmd(target,heating,b.boiler_name,thermo_name)
+print response
 print b.write_state(target,heating)
 print b.read_state()

@@ -9,11 +9,12 @@ class Tempdb:
     def __init__(self,url="http://localhost:8000",region="eu-central-1"):
     	self.dynamodb = boto3.resource('dynamodb', region_name=region, 
 					endpoint_url=url)
-    	self.table = self.dynamodb.Table('Temperature')
+    	self.table_log = self.dynamodb.Table('Temperature')
+        self.table_cmd = self.dynamodb.Table('Commands')
 
     def put_values(self,temperature,humidity,thermo_name="InsideHall",target_t=100,is_heating=0):
          try:
-   		response=self.table.put_item(
+   		response=self.table_log.put_item(
         		Item={
             			'Thermometer': thermo_name,
             			'GetDate': get_now(),
@@ -24,7 +25,7 @@ class Tempdb:
         		}
     		)
          except decimal.Inexact:
-		response=self.table.put_item(
+		response=self.table_log.put_item(
                         Item={
                                 'Thermometer': thermo_name,
                                 'GetDate': get_now(),
@@ -37,10 +38,34 @@ class Tempdb:
          return response
 
     def thermo_get_minutes(self,minutes,thermo_name="InsideHall"):
-        response = self.table.query(
+        response = self.table_log.query(
             KeyConditionExpression=Key('Thermometer').eq(thermo_name) &
                                    Key('GetDate').gt(get_val(time.time()-
 							minutes*60))
+            )
+        return response
+    def thermo_cmd(self,target,heating,boiler_name="InsideHall",thermo_name="InsideHall"):
+        response = self.table_cmd.update_item(
+            Key={
+                'Thermometr': thermo_name,
+                'Boiler': boiler_name
+                },
+                UpdateExpression="set target = :t, heating=:h, utime=:u",
+                ExpressionAttributeValues={
+                    ':t': float_to_decimal(target),
+                    ':h': get_val(heating),
+                    ':u': get_now()
+                },
+                ReturnValues="UPDATED_NEW"
+            )
+        return response
+    
+    def get_cmd(self,boiler_name="InsideHall",thermo_name="InsideHall"):
+        response = self.table_cmd.get_item(
+            Key={
+                'Thermometr': thermo_name,
+                'Boiler': boiler_name
+                }
             )
         return response
 
@@ -59,7 +84,6 @@ def float_to_decimal(float_value):
     Convert a floating point value to a decimal that DynamoDB can store,
     and allow rounding.
     """
-
     # Perform the conversion using a copy of the decimal context that boto3
     # uses. Doing so causes this routine to preserve as much precision as
     # boto3 will allow.

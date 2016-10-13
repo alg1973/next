@@ -1,11 +1,11 @@
 {
     TableName : "Tempreture",
     KeySchema: [       
-        { AttributeName: "Termometr", KeyType: "HASH" },  //Partition key
+        { AttributeName: "Thermometr", KeyType: "HASH" },  //Partition key
         { AttributeName: "GetDate", KeyType: "RANGE" }  //Sort key
     ],
     AttributeDefinitions: [       
-        { AttributeName: "Termometr", AttributeType: "S" },
+        { AttributeName: "Thermometr", AttributeType: "S" },
         { AttributeName: "GetDate", AttributeType: "N" },
     ],
     ProvisionedThroughput: {       
@@ -16,12 +16,12 @@
 {
     TableName : "Commands",
     KeySchema: [       
-        { AttributeName: "Termometr", KeyType: "HASH" },  //Partition key
-        { AttributeName: "Room", KeyType: "RANGE" }  //Sort key
+        { AttributeName: "Thermometr", KeyType: "HASH" },  //Partition key
+        { AttributeName: "Boiler", KeyType: "RANGE" }  //Sort key
     ],
     AttributeDefinitions: [       
-        { AttributeName: "Termometr", AttributeType: "S" },
-        { AttributeName: "Room", AttributeType: "S" },
+        { AttributeName: "Thermometr", AttributeType: "S" },
+        { AttributeName: "Boiler", AttributeType: "S" },
     ],
     ProvisionedThroughput: {       
         ReadCapacityUnits: 5, 

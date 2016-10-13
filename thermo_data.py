@@ -26,7 +26,7 @@ while 1:
         boiler.read_state()
         values=f.sread().split()
         if len(values) == 3:
-                print time.time(),ch,boiler.state['target'],boiler.state['heating']
+                print time.time(),values[0],values[1],boiler.state['target'],boiler.state['heating']
                 db.put_values(values[0],values[1],thermo_name,boiler.state['target'],
                         boiler.state['heating'])
         else:

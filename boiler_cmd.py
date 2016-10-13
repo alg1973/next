@@ -3,6 +3,7 @@
 import tconf
 import bstate
 import sys
+import dyndb
 
 
 if len(sys.argv)==3:
@@ -11,11 +12,11 @@ if len(sys.argv)==3:
 elif len(sys.argv)==4:
 	target=int(sys.argv[1])
 	heating=int(sys.argv[2])
-        thermo_name=sys.argv[3]
+    thermo_name=sys.argv[3]
 else:
 	target=100
 	heating=0
-        thermo_name=tconf.thermo_name
+    thermo_name=tconf.thermo_name
 
 
 b=bstate.Boiler(thermo_name)

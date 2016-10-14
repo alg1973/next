@@ -9,7 +9,7 @@ import errno
 class Boiler:
         def __init__(self, name):
                 self.boiler_name=name
-                self.state= { 'target' : 100, 'heating' : 0 }
+                self.state= { 'target' : -1, 'heating' : -1 }
                 self.state_file=tconf.state_prefix+'/' + self.boiler_name + '.state'
 
 

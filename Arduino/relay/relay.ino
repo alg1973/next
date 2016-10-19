@@ -1,4 +1,4 @@
-int RelayPin = 5;    // Digital Arduino Pin used to control the motor
+int RelayPin = 4;    // Digital Arduino Pin used to control the motor
 String cmd = "";
  
 // the setup routine runs once when you press reset:

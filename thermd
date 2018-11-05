@@ -1,0 +1,39 @@
+#!/usr/bin/python 
+
+import sys
+import time
+import dyndb
+import tconf
+import bstate
+from w1thermsensor import W1ThermSensor
+
+sensor = W1ThermSensor()
+
+
+if len(sys.argv)==3:
+        tty_name=sys.argv[1]
+        thermo_name=sys.argv[2]
+else:
+        tty_name=tconf.tty
+        thermo_name=tconf.thermo_name
+
+#read boiler state file        
+boiler = bstate.Boiler(thermo_name)  
+
+# Connect to Dynamodb
+db=dyndb.Tempdb(tconf.url,tconf.region)
+
+
+
+while True:
+        boiler.read_state()
+	temp_in_c = sensor.get_temperature()
+        if temp_in_c:
+                print time.time(),temp_in_c, 0.0, boiler.state['target'],boiler.state['heating']
+                db.put_values(temp_in_c, 0.0, thermo_name,boiler.state['target'],
+                        boiler.state['heating'])
+        else:
+                print ("ERR read invalid data from serial: '")
+        time.sleep(tconf.therm_rate)
+
+

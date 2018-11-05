@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+if ! ps ax|grep -q '[i]nf_loop'
+then
+cd /home/alg/next
+nohup ./inf_loop >>inf.log 2>&1 &
+fi

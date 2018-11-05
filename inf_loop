@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 cd /home/alg/next
 while true 
-
+do
+./thermd
 sleep 20
 done

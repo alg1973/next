@@ -21,8 +21,8 @@ try:
         		{ 'AttributeName': 'GetDate', 'AttributeType': 'N' },
     		],
     		ProvisionedThroughput = {       
-        		'ReadCapacityUnits': 10, 
-        		'WriteCapacityUnits': 10
+        		'ReadCapacityUnits': 1, 
+        		'WriteCapacityUnits': 1
     		}
 	)
 	print("Table status:", table.table_status)
@@ -43,8 +43,8 @@ try:
         		{ 'AttributeName': 'Boiler', 'AttributeType': 'S' },
     		],
     		ProvisionedThroughput = {       
-        		'ReadCapacityUnits': 5, 
-        		'WriteCapacityUnits': 5
+        		'ReadCapacityUnits': 1, 
+        		'WriteCapacityUnits': 1
     		}
 		)
 	print("Table status:", table.table_status)

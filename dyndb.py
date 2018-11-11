@@ -12,7 +12,7 @@ class Tempdb:
     	self.table_log = self.dynamodb.Table('Temperature')
         self.table_cmd = self.dynamodb.Table('Commands')
 
-    def put_values(self,temperature1,temperature2,thermo_name="InsideHall",target_t=100,is_heating=0):
+    def put_values(self,temperature1,temperature2,thermo_name="InsideHall",target_t=100,is_heating=0, boiler_state=-1):
          try:
    		response=self.table_log.put_item(
         		Item={
@@ -22,6 +22,7 @@ class Tempdb:
             			'val2': get_val(temperature2),
             			'target': get_val(target_t),
             			'heating': get_val(is_heating),
+                                'boiler_state': get_val(boiler_state)
         		}
     		)
          except decimal.Inexact:
@@ -33,6 +34,7 @@ class Tempdb:
                                 'val2': float_to_decimal(temperature2),
             			'target': float_to_decimal(target_t),
             			'heating': get_val(int(is_heating)),
+            			'boiler_state': get_val(int(boiler_state)),
                         }
                 ) 
          return response

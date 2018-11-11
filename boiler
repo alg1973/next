@@ -14,7 +14,7 @@ def db2local(b, db):
     	if b.state['target']!=float(i.get('target',-1)) or  b.state['heating']!=int(i.get('heating',-1)):
             print (b.write_state(float(i.get('target',-1)),int(i.get('heating',-1))))
     else:
-        print ("No boiler '{0}' targets in cloud".format(b.boiler_name),file=sys.stderr)
+        print ("No boiler '{0}' state change in cloud".format(b.boiler_name),file=sys.stderr)
 	sys.exit(1)
     return b.state
 	
@@ -22,7 +22,7 @@ def db2local(b, db):
 thermo_name=tconf.thermo_name
 if len(sys.argv)<2:
 	print ("usage: boiler <cmd> [<target_temperature> <heating> [<thermo_name>]]",file=sys.stderr)
-	print ("              <cmd> - sync,loop,local,db,read",file=sys.stderr)
+	print ("              <cmd> - sync, loop, local, dbw, read",file=sys.stderr)
 	sys.exit(1)
 else:
 	cmd=sys.argv[1]
@@ -49,11 +49,12 @@ elif cmd=='loop': #sync local state from db in loop
 	sys.sleep(tconf.therm_rate*1.5)
 elif cmd=='local': #write values to local state file only
     print (b.write_state(target,heating))
-elif cmd=='db': #write values to db and locally
+elif cmd=='dbw': #write values to db and locally
     response=db.thermo_cmd(target,heating,b.boiler_name,b.boiler_name)
     print (b.write_state(target,heating))
 elif cmd=='read':
     print ('Local file: ', b.read_state())
+    print ('Boiler: ', b.boiler_name )
     response=db.get_cmd(b.boiler_name,b.boiler_name)
     if response.has_key('Item'):
     	i=response['Item']	

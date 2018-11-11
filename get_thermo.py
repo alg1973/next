@@ -34,7 +34,7 @@ response = db.thermo_get_minutes(minutes,thermo_name)
 
 
 for i in response['Items']:
-    print(time.ctime(float(i['GetDate'])),'temp',float(i['val']), 'hum', float(i['hum']),
+    print(time.ctime(float(i['GetDate'])),'temp1',float(i.get('val1', -1)), 'temp2', float(i.get('val2', -1)),
 			int(i.get('target',-1)),int(i.get('heating',-1)))
 
 

@@ -12,14 +12,14 @@ class Tempdb:
     	self.table_log = self.dynamodb.Table('Temperature')
         self.table_cmd = self.dynamodb.Table('Commands')
 
-    def put_values(self,temperature,humidity,thermo_name="InsideHall",target_t=100,is_heating=0):
+    def put_values(self,temperature1,temperature2,thermo_name="InsideHall",target_t=100,is_heating=0):
          try:
    		response=self.table_log.put_item(
         		Item={
             			'Thermometer': thermo_name,
             			'GetDate': get_now(),
-            			'val': get_val(temperature),
-            			'hum': get_val(humidity),
+            			'val1': get_val(temperature1),
+            			'val2': get_val(temperature2),
             			'target': get_val(target_t),
             			'heating': get_val(is_heating),
         		}
@@ -29,8 +29,8 @@ class Tempdb:
                         Item={
                                 'Thermometer': thermo_name,
                                 'GetDate': get_now(),
-                                'val': float_to_decimal(temperature),
-                                'hum': float_to_decimal(humidity),
+                                'val1': float_to_decimal(temperature1),
+                                'val2': float_to_decimal(temperature2),
             			'target': float_to_decimal(target_t),
             			'heating': get_val(int(is_heating)),
                         }

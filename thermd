@@ -1,14 +1,75 @@
 #!/usr/bin/python 
 
+from __future__ import print_function
 import sys
 import time
+import datetime
 import dyndb
 import tconf
 import bstate
 from w1thermsensor import W1ThermSensor
+import subprocess
+
 
 sensor = W1ThermSensor()
 
+def db2local(b, db):
+        response=db.get_cmd(b.boiler_name,b.boiler_name)
+        if response.has_key('Item'):
+                i=response['Item']
+                if b.state['target']!=float(i.get('target',-1)) or  b.state['heating']!=int(i.get('heating',-1)):
+                        print ("Remote state change for {0}".format(b.boiler_name))
+                        print (b.write_state(float(i.get('target',-1)),int(i.get('heating',-1))))
+                        
+        return b.state
+
+
+def boiler_state():
+        out = subprocess.check_output([tconf.relay_cmd])
+        if out:
+                for l in out.splitlines():
+                        state = l.split('=')
+                        if len(state) == 1 and state[0] == tconf.relay:
+                                return state[1]
+        return None
+
+def boiler_on():
+        cur_s = boiler_state()
+        if cur_s == tconf.relay_on:
+                return
+        
+        subprocess.check_output([tconf.relay_cmd, "{0}={1}".format(tconf.relay,tconf.relay_on)])
+
+def boiler_off():
+        cur_s = boiler_state()
+        if cur_s == tconf.relay_off:
+                return
+        
+        subprocess.check_output([tconf.relay_cmd, "{0}={1}".format(tconf.relay,tconf.relay_off)])
+
+def now_day():
+        now = datetime.datetime.now()
+        if now.hour >= 23 or now.hour<7:
+                return 0
+        else:
+                return 1
+
+
+def run_cmd(cur_t, cmd):
+        target_t = cmd.get('target', tconf.def_temp)
+        # command mode: 0 - always off; 1 - maintain target; 2 - target at night, 5 at day  
+        mode = cmd.get('heating', 1)
+        if mode == 0:
+                boiler_off();
+        else:
+                if mode == 2 and now_day():
+                        target_t = tconf.def_temp
+                if cur_t < target_t:
+                        boiler_on()
+                else:
+                        boiler_off()
+
+                                
 
 if len(sys.argv)==3:
         tty_name=sys.argv[1]
@@ -27,13 +88,18 @@ db=dyndb.Tempdb(tconf.url,tconf.region)
 
 while True:
         boiler.read_state()
-	temp_in_c = sensor.get_temperature()
-        if temp_in_c:
-                print time.time(),temp_in_c, 0.0, boiler.state['target'],boiler.state['heating']
-                db.put_values(temp_in_c, 0.0, thermo_name,boiler.state['target'],
+	temp_in_c1 = sensor.get_temperature()
+	temp_in_c2 = sensor.get_temperature()
+        if temp_in_c1:
+                print (time.time(),temp_in_c1, temp_in_c2, boiler.state['target'],boiler.state['heating'])
+                db.put_values(temp_in_c1, temp_in_c2, thermo_name,boiler.state['target'],
                         boiler.state['heating'])
         else:
-                print ("ERR read invalid data from serial: '")
+                print ("ERR read invalid data from wired thermometr: '")
+        
+        boiler_cmd = db2local(boiler, db)
+        run_cmd(temp_in_c1, boiler_cmd)
+
         time.sleep(tconf.therm_rate)
 
 

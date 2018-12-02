@@ -1,9 +1,9 @@
 #!/usr/bin/python
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import time
 
-hostName = ""
-hostPort = 10000
+hostName = "192.168.8.202"
+hostPort = 10003
 
 class therm_server(BaseHTTPRequestHandler):
     def do_GET(self):

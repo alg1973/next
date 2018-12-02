@@ -1,0 +1,11 @@
+sudo firewall-cmd --permanent --add-port=10003/tcp
+nmcli device wifi connect <AP name> password <password>
+
+/etc/sysconfig/network-scripts/ifcfg-wlan0 <<END
+DEVICE=wlan0
+BOOTPROTO=none
+ONBOOT=yes
+NETMASK=255.255.255.0
+IPADDR=192.168.8.202
+ZONE=public
+END

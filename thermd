@@ -49,7 +49,7 @@ def boiler_off(cur_s):
                 return
         
         subprocess.check_output([tconf.relay_cmd, "{0}={1}".format(tconf.relay,tconf.relay_off)],
-                                subprocess.devnull)
+                                stderr=devnull)
 
 def now_day():
         now = datetime.datetime.now()

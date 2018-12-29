@@ -13,6 +13,7 @@ import os
 import sys
 
 devnull = open(os.devnull, 'w')
+logfile = open(tconf.log,'a+')
 
 
 
@@ -22,7 +23,7 @@ def db2local(b, db):
         if response.has_key('Item'):
                 i=response['Item']
                 if b.state['target']!=float(i.get('target',-1)) or  b.state['heating']!=int(i.get('heating',-1)):
-                        print ("Remote state change for {0}".format(b.boiler_name))
+                        print ("Remote state change for {0}".format(b.boiler_name), flush=true, file=logfile)
                         print (b.write_state(float(i.get('target',-1)),int(i.get('heating',-1))))
                         
         return b.state
@@ -96,11 +97,11 @@ while True:
 	temp_in_c2 = sensor.get_temperature()
         cur_s = boiler_state()
         if temp_in_c1:
-                print (time.time(),temp_in_c1, temp_in_c2, boiler.state['target'],boiler.state['heating'], cur_s)
+                print (time.time(),temp_in_c1, temp_in_c2, boiler.state['target'],boiler.state['heating'], cur_s,flush=true, file=logfile)
                 db.put_values(temp_in_c1, temp_in_c2, thermo_name,boiler.state['target'],
                               boiler.state['heating'], cur_s)
         else:
-                print ("ERR read invalid data from wired thermometr: '")
+                print ("ERR read invalid data from wired thermometr: '", flush=true, file=logfile)
         
         boiler_cmd = db2local(boiler, db)
         run_cmd(temp_in_c1, boiler_cmd, cur_s)

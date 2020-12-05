@@ -40,14 +40,16 @@ def boiler_state():
 def boiler_on(cur_s):
         if cur_s == tconf.relay_on:
                 return
-        
+        print ("Switching on") 
+	sys.stdout.flush()
         subprocess.check_output([tconf.relay_cmd, "{0}={1}".format(tconf.relay,tconf.relay_on)], 
                                 stderr=devnull)
 
 def boiler_off(cur_s):
         if cur_s == tconf.relay_off:
                 return
-        
+        print ("Switching off") 
+	sys.stdout.flush()
         subprocess.check_output([tconf.relay_cmd, "{0}={1}".format(tconf.relay,tconf.relay_off)],
                                 stderr=devnull)
 
@@ -69,8 +71,14 @@ def run_cmd(cur_t, cmd, cur_s):
                 if mode == 2 and now_day():
                         target_t = tconf.def_temp
                 if cur_t < target_t:
+			print ("cur t: {0}, target t:{1}, relay state={2}; heat turning on".format(cur_t, target_t, 
+					cur_s))
+			sys.stdout.flush()
                         boiler_on(cur_s)
                 else:
+			print ("cur t: {0}, target t:{1}, relay state={2}; heat turning off".format(cur_t, target_t, 
+					cur_s))
+			sys.stdout.flush()
                         boiler_off(cur_s)
 
                                 
@@ -96,9 +104,11 @@ while True:
 	temp_in_c2 = sensor.get_temperature()
         cur_s = boiler_state()
         if temp_in_c1:
-                print (time.time(),temp_in_c1, temp_in_c2, boiler.state['target'],boiler.state['heating'], cur_s)
+                print (time.time(),temp_in_c1, temp_in_c2, boiler.state['target'],boiler.state['heating'], 
+									cur_s == tconf.relay_on)
+		sys.stdout.flush()
                 db.put_values(temp_in_c1, temp_in_c2, thermo_name,boiler.state['target'],
-                              boiler.state['heating'], cur_s)
+                              boiler.state['heating'], cur_s == tconf.relay_on)
         else:
                 print ("ERR read invalid data from wired thermometr: '")
         

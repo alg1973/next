@@ -11,6 +11,7 @@ from w1thermsensor import W1ThermSensor
 import subprocess
 import os
 import sys
+import fterm
 
 devnull = open(os.devnull, 'w')
 
@@ -97,11 +98,13 @@ boiler = bstate.Boiler(thermo_name)
 db=dyndb.Tempdb(tconf.url,tconf.region)
 
 sensor = W1ThermSensor()
+sensor1 = fterm.fterm()
+
 
 while True:
         boiler.read_state()
 	temp_in_c1 = sensor.get_temperature()
-	temp_in_c2 = sensor.get_temperature()
+	temp_in_c2 = sensor1.get()
         cur_s = boiler_state()
         if temp_in_c1:
                 print (time.time(),temp_in_c1, temp_in_c2, boiler.state['target'],boiler.state['heating'], 

@@ -100,6 +100,13 @@ db=dyndb.Tempdb(tconf.url,tconf.region)
 sensor = W1ThermSensor()
 sensor1 = fterm.fterm()
 
+def choose_temp(loc_t1, rem_t2):
+        if not rem_t2 or int(rem_t2) > 40 or int(rem_t2) < -25:
+                return loc_t1
+        if not loc_t1 or int(loc_t1) > 40 or int(loc_t1) < -25:
+                return rem_t2
+        return loc_t1 if loc_t1 > rem_t2 else rem_t2
+        
 
 while True:
         boiler.read_state()
@@ -116,7 +123,7 @@ while True:
                 print ("ERR read invalid data from wired thermometr: '")
         
         boiler_cmd = db2local(boiler, db)
-        run_cmd(temp_in_c1, boiler_cmd, cur_s)
+        run_cmd(choose_temp(temp_in_c1, temp_in_c2), boiler_cmd, cur_s)
 
         time.sleep(tconf.therm_rate)
 

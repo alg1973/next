@@ -8,8 +8,11 @@ import sys
 if len(sys.argv)>0:
     os.chdir(os.path.dirname(sys.argv[0]))
 
+
+ip = sys.argv[1] if len(sys.argv)>1 and sys.argv[1] else 'http://192.168.8.250/' 
+
 try:
-    r = requests.get("http://192.168.8.250/")
+    r = requests.get(ip)
 except:
     print ("IO error connecting to term server")
     sys.exit(1)

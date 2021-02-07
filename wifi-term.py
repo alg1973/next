@@ -9,7 +9,7 @@ if len(sys.argv)>0:
     os.chdir(os.path.dirname(sys.argv[0]))
 
 
-ip = sys.argv[1] if len(sys.argv)>1 and sys.argv[1] else 'http://192.168.8.250/' 
+ip = sys.argv[1] if len(sys.argv)>1 and sys.argv[1] else 'http://192.168.8.251/' 
 
 try:
     r = requests.get(ip)

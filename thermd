@@ -64,7 +64,7 @@ def now_day():
 
 def run_cmd(cur_t, cmd, cur_s):
         target_t = cmd.get('target', tconf.def_temp)
-        # command mode: 0 - always off; 1 - maintain target; 2 - target at night, 5 at day  
+        # command mode: 0 - always off; 1 - maintain target; 2 - target at night, 7 at day  
         mode = cmd.get('heating', 1)
         if mode == 0:
                 boiler_off(cur_s);
@@ -101,28 +101,37 @@ sensor = W1ThermSensor()
 sensor1 = fterm.fterm()
 
 def choose_temp(loc_t1, rem_t2):
-        if not rem_t2 or int(rem_t2) > 40 or int(rem_t2) < -25:
+        if not rem_t2 or int(rem_t2) > 50 or int(rem_t2) < -25:
                 return loc_t1
-        if not loc_t1 or int(loc_t1) > 40 or int(loc_t1) < -25:
+        if not loc_t1 or int(loc_t1) > 50 or int(loc_t1) < -25:
                 return rem_t2
         return loc_t1 if loc_t1 > rem_t2 else rem_t2
         
 
 while True:
-        boiler.read_state()
+        boiler_cmd = boiler.read_state()
 	temp_in_c1 = sensor.get_temperature()
 	temp_in_c2 = sensor1.get()
         cur_s = boiler_state()
-        if temp_in_c1:
-                print (time.time(),temp_in_c1, temp_in_c2, boiler.state['target'],boiler.state['heating'], 
-									cur_s == tconf.relay_on)
-		sys.stdout.flush()
-                db.put_values(temp_in_c1, temp_in_c2, thermo_name,boiler.state['target'],
-                              boiler.state['heating'], cur_s == tconf.relay_on)
-        else:
-                print ("ERR read invalid data from wired thermometr: '")
+
+        try: 
+                if temp_in_c1:
+                        print (time.time(),temp_in_c1, temp_in_c2, boiler.state['target'],boiler.state['heating'], 
+                               cur_s == tconf.relay_on)
+                        db.put_values(temp_in_c1, temp_in_c2, thermo_name,boiler.state['target'],
+                                      boiler.state['heating'], cur_s == tconf.relay_on)
+                else:
+                        print ("ERR read invalid data from wired thermometr: '")
+
         
-        boiler_cmd = db2local(boiler, db)
+                boiler_cmd = db2local(boiler, db)
+
+        except Exception as e:
+                print("Caught Exception during dynamodb io: {}.".format(e))
+        except:
+                print("Caught unknown exception during dynamodb io.")
+
+        sys.stdout.flush()                
         run_cmd(choose_temp(temp_in_c1, temp_in_c2), boiler_cmd, cur_s)
 
         time.sleep(tconf.therm_rate)

@@ -1,8 +1,11 @@
 #include <DHT.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-//#include <WiFi.h>
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
+#include <esp_task_wdt.h>
+
+
+//#include <ESP8266WiFi.h>
  
 const char* ssid = "dacha";
 //const char* ssid = "sliz";
@@ -28,7 +31,7 @@ const char* password = "9166034125";
 
 #define DHTTYPE DHT11 
 
-//int LED_BUILTIN = 26;
+int LED_BUILTIN = 26;
 //DHT dht(DHTPIN, DHTTYPE);
 OneWire oneWire(ONE_WIRE_PIN);
 DallasTemperature sensors(&oneWire);
@@ -38,12 +41,13 @@ WiFiServer server(80);
 //IPAddress ip(192, 168, 8, 250); // where xx is the desired IP Address
 //IPAddress gateway(192, 168, 8, 1); // set gateway to match your network
 
-IPAddress ip(192, 168, 8, 251); // where xx is the desired IP Address
+IPAddress ip(192, 168, 8, 250); // where xx is the desired IP Address
+//IPAddress ip(192, 168, 8, 254); // where xx is the desired IP Address
 IPAddress gateway(192, 168, 8, 1); // set gateway to match your network
  
 void setup() {
-  ESP.wdtDisable();
-  ESP.wdtEnable(5500);
+  //ESP.wdtDisable();
+  //ESP.wdtEnable(5500);
   Serial.begin(115200);
   delay(10);
  
@@ -58,16 +62,21 @@ void setup() {
   IPAddress subnet(255, 255, 255, 0); // set subnet mask to match your network
   WiFi.config(ip, gateway, subnet); 
   WiFi.begin(ssid, password);
- 
+
+
+  if (esp_task_wdt_init(600, true)!=ESP_OK || esp_task_wdt_add(NULL)!=ESP_OK) {
+      Serial.print("Unable to init watchdog or register, running without it");
+  }
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
+  Serial.println("");
+  Serial.println("WiFi connected");
+
   if (esp_task_wdt_reset()!=ESP_OK) {
       Serial.print("Unable to reset Watchdog during init");
   }
-  Serial.println("");
-  Serial.println("WiFi connected");
  
   // Start the server
   server.begin();
@@ -102,7 +111,6 @@ void loop() {
   }
   // Read the first line of the request
   String request = client.readStringUntil('\r');
-  client.flush();
   Serial.println(request);
   digitalWrite(LED_BUILTIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
   // but actually the LED is on; this is because
@@ -139,6 +147,6 @@ void loop() {
   //Serial.println("");
   delay(500);                      // Wait for a second
   digitalWrite(LED_BUILTIN, HIGH);  // Turn the LED off by making the voltage HIGH
-  //client.flush();
-  //client.stop();
+  client.flush();
+  client.stop();
 }

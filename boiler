@@ -7,6 +7,14 @@ import sys
 import dyndb
 import time
 
+def usage():
+    	print ("usage: boiler <cmd> [<target_temperature> <heating> [<thermo_name>]]",file=sys.stderr)
+	print ("              <cmd> - sync, loop, local, dbw, read",file=sys.stderr)
+        print ("              <heating> - 'night': maintain target at night only",file=sys.stderr)
+        print ("                          'day': maintain target all day long",file=sys.stderr)
+        print ("                          'stop': bolier is off",file=sys.stderr)
+
+
 def db2local(b, db):
     response=db.get_cmd(b.boiler_name,b.boiler_name)
     if response.has_key('Item'):
@@ -21,15 +29,18 @@ def db2local(b, db):
 
 thermo_name=tconf.thermo_name
 if len(sys.argv)<2:
-	print ("usage: boiler <cmd> [<target_temperature> <heating> [<thermo_name>]]",file=sys.stderr)
-	print ("              <cmd> - sync, loop, local, dbw, read",file=sys.stderr)
+        usage();
 	sys.exit(1)
 else:
 	cmd=sys.argv[1]
 
 if len(sys.argv)>3:
 	target=int(sys.argv[2])
-	heating=int(sys.argv[3])
+        cmdmap = { 'night' : 2, 'day': 1, 'stop': 0}
+        heating = cmdmap.get(sys.argv[3], -1)
+        if heating < 0:
+            usage()
+            sys.exit(1);
 	if len(sys.argv)>4:
         	thermo_name=sys.argv[4]
 else:

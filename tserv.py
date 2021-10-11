@@ -3,6 +3,44 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import time
 import tconf
 from re import match as re_match
+import sys
+import time
+import dyndb
+import json
+import decimal
+from boto3.dynamodb.conditions import Key, Attr
+
+# Helper class to convert a DynamoDB item to JSON.
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            if o % 1 > 0:
+                return float(o)
+            else:
+                return int(o)
+        return super(DecimalEncoder, self).default(o)
+
+def show_therm(wserv, minutes, thermo_name):    
+    db=dyndb.Tempdb(tconf.url,tconf.region)
+    if minutes is None:
+        minutes = 60
+    if thermo_name is None:
+        thermo_name=tconf.thermo_name
+        
+    response = db.thermo_get_minutes(minutes,thermo_name)
+    wserv.wfile.write("<table>")
+    for i in response['Items']:
+        wserv.wfile.write("<tr><td>{0}</td><td>{1}</td> <td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td></tr>"
+                          .format(time.ctime(float(i['GetDate'])), float(i.get('val1', -1)),
+                                  float(i.get('val2', -1)), int(i.get('target',-1)),
+                                  int(i.get('heating',-1)),
+                                  int(i.get('boiler_state',-1))).encode(encoding='UTF-8'))
+        
+        print(time.ctime(float(i['GetDate'])),'temp1',float(i.get('val1', -1)), 'temp2', float(i.get('val2', -1)),
+              'target temp',int(i.get('target',-1)),'heating cmd',int(i.get('heating',-1)),
+              'boiler state', int(i.get('boiler_state',-1)))
+    wserv.wfile.write("</table>")
+
 
 hostName = "0.0.0.0"
 hostPort = 10003
@@ -37,17 +75,20 @@ class therm_server(BaseHTTPRequestHandler):
         else:
             params = dict([p.split('=') for p in self.path[i+1:].split('&')])
             print (params)
-            if 't' in params and 'v' in params:
-                if is_term(params['t']):
-                    self.data_file.write("{0} {1} {2}".format(time.time(), params['t'], is_float(params['v']) ))
-                    self.data_file.flush()
+            if 's' in params and 'm' in params:
+                show_therm(self, int(params['m']), None)
+            else:           
+                if 't' in params and 'v' in params:
+                    if is_term(params['t']):
+                        self.data_file.write("{0} {1} {2}".format(time.time(), params['t'], is_float(params['v']) ))
+                        self.data_file.flush()
+                    else:
+                        print ("thermometer param is wrong {0}".format(params['t']))
                 else:
-                    print ("thermometer param is wrong {0}".format(params['t']))
-            else:
-                print ("There aren't 't' and 'v' in request")
-            self.wfile.write("<html><head><title>Got request.</title></head>".encode(encoding='UTF-8'))
-            self.wfile.write("<p>Path is : {0}</p>".format(self.path).encode(encoding='UTF-8'))
-            self.wfile.write("</body></html>".encode(encoding='UTF-8'))
+                    print ("There aren't 't' and 'v' in request")
+                self.wfile.write("<html><head><title>Got request.</title></head>".encode(encoding='UTF-8'))
+                self.wfile.write("<p>Path is : {0}</p>".format(self.path).encode(encoding='UTF-8'))
+                self.wfile.write("</body></html>".encode(encoding='UTF-8'))
 
             
 t_server = HTTPServer((hostName, hostPort), therm_server)

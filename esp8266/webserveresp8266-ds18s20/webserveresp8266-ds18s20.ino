@@ -63,9 +63,7 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
-  if (esp_task_wdt_reset()!=ESP_OK) {
-      Serial.print("Unable to reset Watchdog during init");
-  }
+ 
   Serial.println("");
   Serial.println("WiFi connected");
  
@@ -96,10 +94,7 @@ void loop() {
   while(!client.available()){
     delay(1);
   }
- //Client should call every timeout second (600) or ESP will be resetted.
- if (esp_task_wdt_reset()!=ESP_OK) {
-      Serial.print("Unable to reset Watchdog during client connect");
-  }
+ 
   // Read the first line of the request
   String request = client.readStringUntil('\r');
   client.flush();

@@ -18,24 +18,28 @@ class DecimalEncoder(json.JSONEncoder):
                 return int(o)
         return super(DecimalEncoder, self).default(o)
 
+thermo_name=tconf.thermo_name
+minutes=60
+frm = 'table'
 
 if len(sys.argv)==2:
 	minutes=int(sys.argv[1])
-        thermo_name=tconf.thermo_name
+
 elif len(sys.argv)==3:
 	minutes=int(sys.argv[1])
-        thermo_name=sys.argv[2]
-else:
-	minutes=60
-        thermo_name=tconf.thermo_name
+        frm=sys.argv[2]
+
 
 db=dyndb.Tempdb(tconf.url,tconf.region)
 response = db.thermo_get_minutes(minutes,thermo_name)
 
-
-for i in response['Items']:
-    print(time.ctime(float(i['GetDate'])),'temp1',float(i.get('val1', -1)), 'temp2', float(i.get('val2', -1)),
-          'target temp',int(i.get('target',-1)),'heating cmd',int(i.get('heating',-1)), 
-        'boiler state', int(i.get('boiler_state',-1)))
+if frm == 'data':
+    for i in response['Items']:
+        print("{1} {0}".format(float(i['GetDate']),float(i.get('val1', -1))))
+else:    
+    for i in response['Items']:
+        print(time.ctime(float(i['GetDate'])),'temp1',float(i.get('val1', -1)), 'temp2', float(i.get('val2', -1)),
+              'target temp',int(i.get('target',-1)),'heating cmd',int(i.get('heating',-1)), 
+              'boiler state', int(i.get('boiler_state',-1)))
 
 

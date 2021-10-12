@@ -28,13 +28,17 @@ def show_therm(wserv, minutes, thermo_name):
         thermo_name=tconf.thermo_name
         
     response = db.thermo_get_minutes(minutes,thermo_name)
-    wserv.wfile.write("<table>")
+    wserv.wfile.write("<h1>Temperature data</h1><p><table border=1>")
+    wserv.wfile.write("<th>Date</th><th>T1</th><th>T2</th><th>Target T</th><th>mode</th><th>Boiler</th>")
+    cmdmap = { 2: 'Night', 1: 'Day', 0: 'Off', 3: 'Undef'}
+    bmap = { 1: '+', 0: '-', 2: 'Undef' }
     for i in response['Items']:
         wserv.wfile.write("<tr><td>{0}</td><td>{1}</td> <td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td></tr>"
-                          .format(time.ctime(float(i['GetDate'])), float(i.get('val1', -1)),
+                          .format(time.strftime("%d.%m %H:%M:%S",time.localtime(float(i['GetDate']))),
+                                  float(i.get('val1', -1)),
                                   float(i.get('val2', -1)), int(i.get('target',-1)),
-                                  int(i.get('heating',-1)),
-                                  int(i.get('boiler_state',-1))).encode(encoding='UTF-8'))
+                                  cmdmap.get(int(i.get('heating',-1)),3),
+                                  bmap.get(int(i.get('boiler_state',-1)),2)).encode(encoding='UTF-8'))
         
         print(time.ctime(float(i['GetDate'])),'temp1',float(i.get('val1', -1)), 'temp2', float(i.get('val2', -1)),
               'target temp',int(i.get('target',-1)),'heating cmd',int(i.get('heating',-1)),

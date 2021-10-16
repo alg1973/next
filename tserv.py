@@ -4,11 +4,13 @@ import time
 import tconf
 from re import match as re_match
 import sys
+import os
 import time
 import dyndb
 import json
 import decimal
 from boto3.dynamodb.conditions import Key, Attr
+import graph
 
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
@@ -65,14 +67,16 @@ def is_term(s):
 class therm_server(BaseHTTPRequestHandler):
     def __init__(self, a, b, c):
         self.data_file = open(serv_therm_file, "a")
+        self.ticks = time.time()
+        self.pid = os.getpid()
         BaseHTTPRequestHandler.__init__(self, a, b, c)
 
     def do_GET(self):
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
         i=self.path.find('?')
-        if i == -1: 
+        if i == -1:
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
             self.wfile.write("<html><head><title>Wrong request.</title></head>".encode(encoding='UTF-8'))
             self.wfile.write("<p>Path is invalid: {0}</p>".format(self.path).encode(encoding='UTF-8'))
             self.wfile.write("</body></html>".encode(encoding='UTF-8'))
@@ -80,7 +84,29 @@ class therm_server(BaseHTTPRequestHandler):
             params = dict([p.split('=') for p in self.path[i+1:].split('&')])
             print (params)
             if 's' in params and 'm' in params:
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.wfile.write("<html><head><title>Thermo page</title></head>".encode(encoding='UTF-8'))
+                self.wfile.write('<p><form><label for="target">Target Temperature:</label>'.encode(encoding='UTF-8'))
+                self.wfile.write('<input type=text id="target" name="target" value="10">'.encode(encoding='UTF-8'))
+                self.wfile.write('&nbsp;[<input type="radio" id="nt" name="mode" value="night">'.encode(encoding='UTF-8'))
+                self.wfile.write('<label for="nt">Night</label>'.encode(encoding='UTF-8'))
+                self.wfile.write('<input type="radio" id="day" name="mode" value="day">'.encode(encoding='UTF-8'))
+                self.wfile.write('<label for="day">Whole Day</label>]'.encode(encoding='UTF-8'))
+                self.wfile.write('&nbsp;<input type="submit" value="Set"><br><hr></form>'.encode(encoding='UTF-8'))
+                self.wfile.write('<p><img src="?i=1&m='.encode(encoding='UTF-8'))
+                self.wfile.write(str(int(params['m'])).encode(encoding='UTF-8'))
+                self.wfile.write('"><p><hr>'.encode(encoding='UTF-8'))
                 show_therm(self, int(params['m']), None)
+            elif 'i' in params and 'm' in params:
+                self.send_header("Content-type", "image/png")
+                self.end_headers()
+                self.ticks =+ 1;
+                fl_name = "/tmp/img_"+str(self.pid)+str(self.ticks)+".png"
+                graph.do_graph(int(params['m']), fl_name)
+                with open(fl_name, 'r') as file:
+                    self.wfile.write(file.read())
+                os.remove(fl_file)
             else:           
                 if 't' in params and 'v' in params:
                     if is_term(params['t']):

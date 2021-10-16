@@ -98,6 +98,8 @@ class therm_server(BaseHTTPRequestHandler):
                 self.wfile.write(str(int(params['m'])).encode(encoding='UTF-8'))
                 self.wfile.write('"><p><hr>'.encode(encoding='UTF-8'))
                 show_therm(self, int(params['m']), None)
+            elif 'target' in params and 'mode' in params:
+                
             elif 'i' in params and 'm' in params:
                 self.send_header("Content-type", "image/png")
                 self.end_headers()
@@ -106,7 +108,12 @@ class therm_server(BaseHTTPRequestHandler):
                 graph.do_graph(int(params['m']), fl_name)
                 with open(fl_name, 'r') as file:
                     self.wfile.write(file.read())
-                os.remove(fl_file)
+                try:
+                    os.remove(fl_file)
+                    print("% s removed successfully" % path)
+                except OSError as error:
+                    print(error)
+                    print("File path can not be removed")
             else:           
                 if 't' in params and 'v' in params:
                     if is_term(params['t']):

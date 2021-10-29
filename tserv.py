@@ -99,7 +99,7 @@ class therm_server(BaseHTTPRequestHandler):
                 self.wfile.write('"><p><hr>'.encode(encoding='UTF-8'))
                 show_therm(self, int(params['m']), None)
             elif 'target' in params and 'mode' in params:
-                
+                pass
             elif 'i' in params and 'm' in params:
                 self.send_header("Content-type", "image/png")
                 self.end_headers()

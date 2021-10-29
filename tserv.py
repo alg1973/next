@@ -109,7 +109,7 @@ class therm_server(BaseHTTPRequestHandler):
                 with open(fl_name, 'r') as file:
                     self.wfile.write(file.read())
                 try:
-                    os.remove(fl_file)
+                    os.remove(fl_name)
                     print("% s removed successfully" % path)
                 except OSError as error:
                     print(error)

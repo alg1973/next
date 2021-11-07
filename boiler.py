@@ -34,7 +34,7 @@ def set_boiler(cmd, target=None, heating_s=None, thermo_name=None):
         b=bstate.Boiler(thermo_name) #Assume thermo_name always equal to boiler_name
         db=dyndb.Tempdb(tconf.url,tconf.region)
         heating = cmdmap.get(heating_s, -1)
-
+        ret_s = ''
         
         if cmd=='sync': #update local state from db
                 db2local(b,db)
@@ -53,14 +53,17 @@ def set_boiler(cmd, target=None, heating_s=None, thermo_name=None):
                 response=db.get_cmd(b.boiler_name,b.boiler_name)
                 if response.has_key('Item'):
     	                i=response['Item']	
-    	                print("Remote command: target: '{1}', is heating: '{2}', updated at '{0}'".format(
+    	                ret_s = "Remote command: target: '{1}', is heating: '{2}', updated at '{0}'".format(
 			        time.ctime(float(i['utime'])),float(i.get('target',-1)),
-                	        int(i.get('heating',-1))))
+                	        int(i.get('heating',-1)))
+                        print (ret_s)
                 else:
-                        print ("No boiler '{0}' targets in cloud".format(b.boiler_name),file=sys.stderr)
+                        ret_s = "No boiler '{0}' targets in cloud".format(b.boiler_name)
+                        print (ret_s, file=sys.stderr)
         else:
                 print ('Unknown command: ', cmd,file=sys.stderr)
                 raise Exception('Unknown command')
+        return ret_s
 
 
 if __name__ == "__main__":

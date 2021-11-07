@@ -18,11 +18,11 @@ def create_img(ts, values, save_file=None):
         last_time = ("Temperature [Last: "+str(values[-1])+c+dates[-1].strftime("%a %d-%m-%Y %H:%M:%S")+"]")
 
         fig, ax = plt.subplots()
-        ax.plot_date(dates, values, linestyle='dashed', linewidth = 1)
-        ax.xaxis.set_major_formatter( DateFormatter('%d %H:%M') )
+        ax.plot_date(dates, values, linestyle='dashed',markersize=2, linewidth = 1)
+        ax.xaxis.set_major_formatter( DateFormatter('%d.%m %H:%M') )
         # setting x and y axis range
         ax.set_xlim(dates[0], dates[-1])
-        ax.set_ylim(5, 24)
+        ax.set_ylim(-1, 35)
 
         # The hour locator takes the hour or sequence of hours you want to
         # tick, not the base multiple

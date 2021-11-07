@@ -11,6 +11,7 @@ import json
 import decimal
 from boto3.dynamodb.conditions import Key, Attr
 import graph
+import boiler
 
 # Helper class to convert a DynamoDB item to JSON.
 class DecimalEncoder(json.JSONEncoder):
@@ -34,7 +35,7 @@ def show_therm(wserv, minutes, thermo_name):
     wserv.wfile.write("<th>Date</th><th>T1</th><th>T2</th><th>Target T</th><th>mode</th><th>Boiler</th>")
     cmdmap = { 2: 'Night', 1: 'Day', 0: 'Off', 3: 'Undef'}
     bmap = { 1: '+', 0: '-', 2: 'Undef' }
-    for i in response['Items']:
+    for i in reversed(response['Items']):
         wserv.wfile.write("<tr><td>{0}</td><td>{1}</td> <td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td></tr>"
                           .format(time.strftime("%d.%m %H:%M:%S",time.localtime(float(i['GetDate']))),
                                   float(i.get('val1', -1)),
@@ -83,11 +84,17 @@ class therm_server(BaseHTTPRequestHandler):
         else:
             params = dict([p.split('=') for p in self.path[i+1:].split('&')])
             print (params)
+            if 'target' in params and 'mode' in params:
+                boiler.set_boiler('dbw', int(params['target']), params['mode']);
+                params['s'] = 1
+                params['m'] = 600
             if 's' in params and 'm' in params:
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.wfile.write("<html><head><title>Thermo page</title></head>".encode(encoding='UTF-8'))
+                self.wfile.write('<p><a="/?s=1&m=1200">Refresh</a>'.encode(encoding='UTF-8'))
                 self.wfile.write('<p><form><label for="target">Target Temperature:</label>'.encode(encoding='UTF-8'))
+                
                 self.wfile.write('<input type=text id="target" name="target" value="10">'.encode(encoding='UTF-8'))
                 self.wfile.write('&nbsp;[<input type="radio" id="nt" name="mode" value="night">'.encode(encoding='UTF-8'))
                 self.wfile.write('<label for="nt">Night</label>'.encode(encoding='UTF-8'))
@@ -96,10 +103,10 @@ class therm_server(BaseHTTPRequestHandler):
                 self.wfile.write('&nbsp;<input type="submit" value="Set"><br><hr></form>'.encode(encoding='UTF-8'))
                 self.wfile.write('<p><img src="?i=1&m='.encode(encoding='UTF-8'))
                 self.wfile.write(str(int(params['m'])).encode(encoding='UTF-8'))
-                self.wfile.write('"><p><hr>'.encode(encoding='UTF-8'))
+                self.wfile.write('"><p><hr><p>'.encode(encoding='UTF-8'))
+                self.wfile.write(boiler.set_boiler('read').encode(encoding='UTF-8'))
+                self.wfile.write('<hr>'.encode(encoding='UTF-8'))
                 show_therm(self, int(params['m']), None)
-            elif 'target' in params and 'mode' in params:
-                pass
             elif 'i' in params and 'm' in params:
                 self.send_header("Content-type", "image/png")
                 self.end_headers()
@@ -124,6 +131,7 @@ class therm_server(BaseHTTPRequestHandler):
                     print ("There aren't 't' and 'v' in request")
                 self.wfile.write("<html><head><title>Got request.</title></head>".encode(encoding='UTF-8'))
                 self.wfile.write("<p>Path is : {0}</p>".format(self.path).encode(encoding='UTF-8'))
+                self.wfile.write('<p><a="/?s=1&m=1200">Refresh</a>'.encode(encoding='UTF-8'))
                 self.wfile.write("</body></html>".encode(encoding='UTF-8'))
 
             

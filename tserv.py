@@ -80,6 +80,7 @@ class therm_server(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write("<html><head><title>Wrong request.</title></head>".encode(encoding='UTF-8'))
             self.wfile.write("<p>Path is invalid: {0}</p>".format(self.path).encode(encoding='UTF-8'))
+            self.wfile.write('<p><a href="/?s=1&m=1200">Refresh</a>'.encode(encoding='UTF-8'))
             self.wfile.write("</body></html>".encode(encoding='UTF-8'))
         else:
             params = dict([p.split('=') for p in self.path[i+1:].split('&')])
@@ -92,7 +93,7 @@ class therm_server(BaseHTTPRequestHandler):
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.wfile.write("<html><head><title>Thermo page</title></head>".encode(encoding='UTF-8'))
-                self.wfile.write('<p><a="/?s=1&m=1200">Refresh</a>'.encode(encoding='UTF-8'))
+                self.wfile.write('<p><a href="/?s=1&m=1200">Refresh</a>'.encode(encoding='UTF-8'))
                 self.wfile.write('<p><form><label for="target">Target Temperature:</label>'.encode(encoding='UTF-8'))
                 
                 self.wfile.write('<input type=text id="target" name="target" value="10">'.encode(encoding='UTF-8'))
@@ -131,7 +132,7 @@ class therm_server(BaseHTTPRequestHandler):
                     print ("There aren't 't' and 'v' in request")
                 self.wfile.write("<html><head><title>Got request.</title></head>".encode(encoding='UTF-8'))
                 self.wfile.write("<p>Path is : {0}</p>".format(self.path).encode(encoding='UTF-8'))
-                self.wfile.write('<p><a="/?s=1&m=1200">Refresh</a>'.encode(encoding='UTF-8'))
+                self.wfile.write('<p><a href="/?s=1&m=1200">Refresh</a>'.encode(encoding='UTF-8'))
                 self.wfile.write("</body></html>".encode(encoding='UTF-8'))
 
             
